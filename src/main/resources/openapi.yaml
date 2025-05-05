@@ -1,0 +1,101 @@
+openapi: 3.0.0
+info:
+  title: Price Service API
+  description: API for querying product prices from the price database, which includes product pricing, tariff, and validity periods.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+paths:
+  /prices:
+    get:
+      summary: Get the price of a product for a specific brand within a date range.
+      description: |
+        This endpoint retrieves the price of a product for a specific brand, validated against the provided date range.
+        If no price is found for the product in the specified date range, a 404 error will be returned.
+      parameters:
+        - in: query
+          name: date
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: Date and time in ISO 8601 format (e.g., 2025-04-30T10:00:00).
+        - in: query
+          name: productId
+          required: true
+          schema:
+            type: integer
+          description: Unique identifier for the product.
+        - in: query
+          name: brandId
+          required: true
+          schema:
+            type: integer
+          description: Unique identifier for the brand.
+      responses:
+        '200':
+          description: Successfully retrieved the price for the specified product and brand within the date range.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  productId:
+                    type: integer
+                    description: Unique identifier for the product.
+                  brandId:
+                    type: integer
+                    description: Unique identifier for the brand.
+                  priceList:
+                    type: integer
+                    description: Identifier for the price list applied.
+                  startDate:
+                    type: string
+                    format: date-time
+                    description: The start date when the price is valid.
+                  endDate:
+                    type: string
+                    format: date-time
+                    description: The end date when the price is valid.
+                  price:
+                    type: number
+                    format: float
+                    description: The final selling price of the product.
+              examples:
+                application/json:
+                  value:
+                    productId: 35455
+                    brandId: 1
+                    priceList: 1
+                    startDate: "2020-06-14T00:00:00"
+                    endDate: "2020-12-31T23:59:59"
+                    price: 35.50
+        '400':
+          description: Incorrect input parameters.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Description of the error.
+              examples:
+                application/json:
+                  value:
+                    error: "Invalid date format. Expected date-time format (yyyy-MM-dd'T'HH:mm:ss)."
+        '404':
+          description: No price found for the product and brand within the specified dates.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Description of the error.
+              examples:
+                application/json:
+                  value:
+                    error: "Price not found for product 35455 and brand 1 at the specified date."
