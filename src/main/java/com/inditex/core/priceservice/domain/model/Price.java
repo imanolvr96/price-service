@@ -1,53 +1,32 @@
 package com.inditex.core.priceservice.domain.model;
 
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "prices")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class Price {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
-
-    @Column(name = "brand_id")
-    private Integer brandId;
-
-    @Column(name = "product_id")
-    private Integer productId;
-
-    @Column(name = "priority")
-    private Integer priority;
-
-    @Column(name = "price")
-    private Double price;
-
-    @Column(name = "curr")
-    private String currency;
-
-    @Column(name = "start_date")
-    private LocalDateTime startDate;
-
-    @Column(name = "end_date")
-    private LocalDateTime endDate;
-
-    @Column(name = "price_list")
-    private Integer priceList;
+/**
+ * A record representing the price information for a product.
+ * <p>
+ * This record holds the details of a price entry for a specific product, brand, and date range.
+ * It contains information about the price list, the start and end dates of the price's validity,
+ * the product ID, the brand ID, the price amount, the priority of the price, and the currency.
+ * </p>
+ *
+ * @param brandId   The ID of the brand associated with the price.
+ * @param startDate The date and time when the price becomes valid.
+ * @param endDate   The date and time when the price ceases to be valid.
+ * @param priceList The ID of the price list under which the price is listed.
+ * @param productId The ID of the product for which the price applies.
+ * @param priority  The priority of the price, determining which price applies if there are multiple.
+ * @param price     The price value for the product.
+ * @param currency  The currency of the price (e.g., "EUR", "USD").
+ */
+public record Price(
+        Integer brandId,
+        LocalDateTime startDate,
+        LocalDateTime endDate,
+        Integer priceList,
+        Integer productId,
+        Integer priority,
+        Double price,
+        String currency
+) {
 }
