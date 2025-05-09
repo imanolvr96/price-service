@@ -1,51 +1,51 @@
 package com.inditex.core.priceservice.application.service;
 
 import com.inditex.core.priceservice.application.mapper.PriceMapper;
+import com.inditex.core.priceservice.domain.exception.PriceNotFoundException;
 import com.inditex.core.priceservice.domain.repository.PriceRepository;
 import com.inditex.core.priceservice.infrastructure.persistence.entity.PriceEntity;
 import com.inditex.core.priceservice.infrastructure.rest.dto.PriceResponseDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 /**
- * Service class responsible for retrieving price information based on product, brand, and application date.
- * This service interacts with the PriceRepository to access data from the database.
+ * Service responsible for retrieving price information based on product, brand, and application date.
+ * <p>
+ * Delegates data access to the domain repository and maps domain entities to response DTOs.
+ * </p>
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PriceService {
 
     private final PriceRepository priceRepository;
-
-    public PriceService(PriceRepository priceRepository) {
-        this.priceRepository = priceRepository;
-    }
+    private final PriceMapper priceMapper;
 
     /**
      * Retrieves the applicable price for the given brand, product, and application date.
      *
-     * @param brandId         the ID of the brand
+     * @param applicationDate the date and time of application
      * @param productId       the ID of the product
-     * @param applicationDate the date and time when the price is being applied
-     * @return an Optional containing a list with a single PriceResponseDto if found
+     * @param brandId         the ID of the brand
+     * @return the applicable price as a DTO
+     * @throws PriceNotFoundException if no applicable price is found
      */
-    public Optional<PriceResponseDto> getPrice(LocalDateTime applicationDate, Integer productId, Integer brandId) {
-        log.info("Retrieving price for product ID: {} with brand ID: {} at application date: {}", productId, brandId, applicationDate);
+    public PriceResponseDto getPrice(LocalDateTime applicationDate, Integer productId, Integer brandId) {
+        log.debug("Fetching price for productId={}, brandId={}, date={}", productId, brandId, applicationDate);
 
         PriceEntity price = priceRepository.findApplicablePrice(applicationDate, productId, brandId);
 
         if (price == null) {
-            log.warn("No price found for product ID: {} with brand ID: {} at application date: {}", productId, brandId, applicationDate);
-            return Optional.empty();
+            log.warn("No applicable price found for productId={}, brandId={}, date={}", productId, brandId, applicationDate);
+            throw new PriceNotFoundException(productId, brandId, applicationDate);
         }
 
-        // Map the PriceEntity to a PriceResponseDto
-        PriceResponseDto priceResponseDto = PriceMapper.INSTANCE.toDto(price);
-
-        log.info("Found price for product ID: {} with brand ID: {} at application date: {}", productId, brandId, applicationDate);
-        return Optional.of(priceResponseDto);
+        PriceResponseDto dto = priceMapper.toDto(price);
+        log.debug("Mapped price entity to DTO: {}", dto);
+        return dto;
     }
 }

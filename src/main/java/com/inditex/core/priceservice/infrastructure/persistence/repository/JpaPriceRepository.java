@@ -9,26 +9,30 @@ import java.time.LocalDateTime;
 
 /**
  * JPA repository for accessing the "prices" table.
- * Defines a native query to retrieve the applicable price
- * based on the application date, product ID, and brand ID.
+ * <p>
+ * This interface defines the methods for interacting with the prices table,
+ * specifically focusing on retrieving the applicable price based on a product ID,
+ * brand ID, and application date. It uses a native SQL query to select the price
+ * with the highest priority that falls within the valid date range.
+ * </p>
  */
 public interface JpaPriceRepository extends JpaRepository<PriceEntity, Long> {
 
     /**
-     * Retrieves the applicable price for a given product and brand at a specific application date.
-     * The method selects the price from the 'prices' table based on the provided product ID, brand ID,
-     * and application date, and returns the price with the highest priority within the specified date range.
+     * Retrieves the applicable price for a given product, brand, and application date.
+     * <p>
+     * This method performs a native SQL query to select the price from the 'prices' table based on the provided
+     * product ID, brand ID, and application date. The query ensures that the price is within the valid date range
+     * (between 'start_date' and 'end_date'), and selects the price with the highest priority (using 'ORDER BY priority DESC').
+     * If there are multiple prices applicable at the same time, the one with the highest priority will be returned.
+     * </p>
      *
-     * <p>The query ensures that the price selected is within the valid date range (between 'start_date' and
-     * 'end_date') and is the one with the highest priority (using 'ORDER BY priority DESC').
-     * If there are multiple applicable prices, the one with the highest priority is returned.</p>
-     *
-     * @param applicationDate the date and time for which the price is being queried. This date must fall within
-     *                        the price's start and end date range.
-     * @param productId       the unique identifier of the product for which the price is being queried.
-     * @param brandId         the unique identifier of the brand for which the price is being queried.
-     * @return a {@link PriceEntity} representing the applicable price, or {@code null} if no price is found
-     * for the given parameters.
+     * @param applicationDate the date and time when the price is being applied.
+     *                        This must fall within the price's start and end date range.
+     * @param productId       the unique identifier of the product.
+     * @param brandId         the unique identifier of the brand.
+     * @return a {@link PriceEntity} representing the applicable price,
+     * or {@code null} if no price is found for the given parameters.
      */
     @Query(value = """
             SELECT *
