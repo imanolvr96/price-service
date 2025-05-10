@@ -14,7 +14,7 @@ COPY pom.xml .
 COPY src ./src
 
 # Build the application using Maven Wrapper, skipping tests for faster build
-#RUN ./mvnw clean package -DskipTests
+RUN ./mvnw clean package -DskipTests
 
 # Stage 2: Create a smaller final image for running the application
 # We use the JRE image (Java Runtime Environment) which is smaller and does not include development tools
