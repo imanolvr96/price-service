@@ -21,6 +21,9 @@ import java.time.LocalDateTime;
  * in the "prices" table, such as the brand ID, product ID, start and end dates, price list, priority, price, and currency.
  * It is annotated with JPA annotations to define how the entity is mapped to the database.
  * </p>
+ *
+ * @author Imanol Villalba Rodríguez
+ * @since 2025-05-10
  */
 @Entity
 @Table(name = "prices")

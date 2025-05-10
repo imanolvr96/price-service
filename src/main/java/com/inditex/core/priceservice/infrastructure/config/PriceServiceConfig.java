@@ -13,6 +13,9 @@ import org.springframework.context.annotation.Configuration;
  * repository used to manage price data. It ensures that the necessary dependencies for the
  * {@link PriceRepository} are correctly instantiated and injected into the application context.
  * </p>
+ *
+ * @author Imanol Villalba Rodríguez
+ * @since 2025-05-10
  */
 @Configuration
 public class PriceServiceConfig {

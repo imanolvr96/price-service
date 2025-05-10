@@ -9,6 +9,9 @@ import org.mapstruct.Mapper;
  * <p>
  * This mapper is implemented automatically by MapStruct and registered as a Spring bean.
  * </p>
+ *
+ * @author Imanol Villalba Rodríguez
+ * @since 2025-05-10
  */
 @Mapper(componentModel = "spring")
 public interface PriceMapper {

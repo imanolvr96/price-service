@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
  * brand ID, and application date. It uses a native SQL query to select the price
  * with the highest priority that falls within the valid date range.
  * </p>
+ *
+ * @author Imanol Villalba Rodríguez
+ * @since 2025-05-10
  */
 public interface JpaPriceRepository extends JpaRepository<PriceEntity, Long> {
 

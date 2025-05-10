@@ -14,6 +14,9 @@ import java.time.LocalDateTime;
  * The data is inserted into the {@link JpaPriceRepository} using {@link PriceEntity} objects, which are saved
  * into the database. This ensures that the database is pre-populated with test data for the application to work with.
  * </p>
+ *
+ * @author Imanol Villalba Rodríguez
+ * @since 2025-05-10
  */
 @Component
 @RequiredArgsConstructor

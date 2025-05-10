@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
  * based on the application date, product ID, and brand ID.
  * Implementations of this interface should handle the logic to query the underlying data source.
  * </p>
+ *
+ * @author Imanol Villalba Rodríguez
+ * @since 2025-05-10
  */
 public interface PriceRepository {
 
@@ -20,8 +23,7 @@ public interface PriceRepository {
      * @param applicationDate the date and time when the price should be applied
      * @param productId       the ID of the product
      * @param brandId         the ID of the brand
-     * @return the applicable PriceEntity, or {@code null} if none found
+     * @return the applicable {@link PriceEntity}, or {@code null} if none found
      */
     PriceEntity findApplicablePrice(LocalDateTime applicationDate, Integer productId, Integer brandId);
 }
-

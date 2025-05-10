@@ -28,6 +28,9 @@ import java.time.LocalDateTime;
  * <p>This controller provides an endpoint to retrieve the applicable price
  * for a product and brand at a specific date and time. It delegates the business
  * logic to the {@link PriceService} and returns structured responses.</p>
+ *
+ * @author Imanol Villalba Rodríguez
+ * @date 10/05/2025
  */
 @Slf4j
 @Validated
@@ -38,17 +41,28 @@ public class PriceController {
 
     private final PriceService priceService;
 
+    /**
+     * Constructs a new {@link PriceController} with the given {@link PriceService}.
+     *
+     * @param priceService the price service to be used for price-related operations
+     */
     public PriceController(PriceService priceService) {
         this.priceService = priceService;
     }
 
     /**
      * Retrieves the applicable price for the given brand, product, and application date.
+     * <p>
+     * This method handles HTTP GET requests to retrieve the price for a specific product,
+     * brand, and date. It performs validation on the parameters, delegates the business logic
+     * to the {@link PriceService}, and returns a structured response with the price details.
+     * </p>
      *
-     * @param brandId         the ID of the brand
-     * @param productId       the ID of the product
+     * @param brandId         the ID of the brand for which the price is requested
+     * @param productId       the ID of the product for which the price is requested
      * @param applicationDate the date and time when the price is being applied
-     * @return a PriceResponseDto containing the price details if found
+     * @return a {@link ResponseEntity} containing a {@link PriceResponseDto} with the price details
+     * if found, or an error response if not
      */
     @Operation(
             summary = "Get applicable price",
@@ -91,14 +105,22 @@ public class PriceController {
     @GetMapping
     public ResponseEntity<PriceResponseDto> getPrice(
             @Parameter(description = "ID of the brand", required = true)
-            @RequestParam @NotNull(message = "brandId is required") @PositiveOrZero(message = "brandId must be zero or positive") Integer brandId,
+            @RequestParam
+            @NotNull(message = "brandId is required")
+            @PositiveOrZero(message = "brandId must be zero or positive")
+            Integer brandId,
 
             @Parameter(description = "ID of the product", required = true)
-            @RequestParam @NotNull(message = "productId is required") @PositiveOrZero(message = "productId must be zero or positive") Integer productId,
+            @RequestParam
+            @NotNull(message = "productId is required")
+            @PositiveOrZero(message = "productId must be zero or positive")
+            Integer productId,
 
             @Parameter(description = "Application date and time", required = true)
-            @RequestParam @NotNull(message = "applicationDate is required")
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime applicationDate) {
+            @RequestParam
+            @NotNull(message = "applicationDate is required")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime applicationDate) {
 
         log.info("Request received for brandId={}, productId={}, applicationDate={}", brandId, productId, applicationDate);
 

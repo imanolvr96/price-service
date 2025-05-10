@@ -12,6 +12,9 @@ import org.springframework.context.annotation.Configuration;
  * This class defines the OpenAPI configuration for exposing the REST endpoints via Swagger UI.
  * It provides the OpenAPI metadata and groups the API under a "public" group for easy access and documentation.
  * </p>
+ *
+ * @author Imanol Villalba Rodríguez
+ * @since 2025-05-10
  */
 @Configuration
 public class OpenApiConfig {
@@ -19,11 +22,11 @@ public class OpenApiConfig {
     /**
      * Creates a {@link GroupedOpenApi} bean for the public API group.
      * <p>
-     * This bean configures the API documentation group that includes all endpoints under "/api/**".
+     * This bean configures the API documentation group that includes all endpoints under {@code /api/**}.
      * It is used to categorize the public endpoints in the Swagger UI.
      * </p>
      *
-     * @return A {@link GroupedOpenApi} object that groups the public API under the "public" group.
+     * @return a {@link GroupedOpenApi} object that groups the public API under the "public" group
      */
     @Bean
     public GroupedOpenApi publicApi() {
@@ -40,7 +43,7 @@ public class OpenApiConfig {
      * the Swagger UI and will provide users with information about the API's functionality and version.
      * </p>
      *
-     * @return An {@link OpenAPI} object containing the metadata for the Price Service API.
+     * @return an {@link OpenAPI} object containing the metadata for the Price Service API
      */
     @Bean
     public OpenAPI customOpenAPI() {
