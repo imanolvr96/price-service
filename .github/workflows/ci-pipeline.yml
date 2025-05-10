@@ -23,14 +23,9 @@ jobs:
       - name: Build with Maven Wrapper
         run: ./mvnw clean package -DskipTests
 
-      - name: Set up Docker
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker.io
-
       - name: Build Docker image
         run: |
-          docker build -t price-service .
+          docker build -t price-service:latest .
 
       - name: Run tests
         run: ./mvnw test
