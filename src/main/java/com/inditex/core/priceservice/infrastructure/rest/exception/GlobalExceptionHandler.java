@@ -3,6 +3,8 @@ package com.inditex.core.priceservice.infrastructure.rest.exception;
 import com.inditex.core.priceservice.domain.exception.PriceNotFoundException;
 import com.inditex.core.priceservice.infrastructure.rest.dto.ApiErrorResponse;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -22,6 +25,7 @@ import java.util.Map;
  * It provides customized responses for various exceptions that may occur during the execution of the API requests.
  * </p>
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -37,6 +41,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(PriceNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handlePriceNotFound(PriceNotFoundException ex) {
+        log.warn("PriceNotFoundException: {}", ex.getMessage());
         ApiErrorResponse response = new ApiErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
@@ -53,11 +58,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
+        log.warn("MethodArgumentNotValidException: Invalid request parameters.");
         StringBuilder errorMessage = new StringBuilder("Invalid request parameters: ");
-        ex.getBindingResult().getFieldErrors().forEach(fieldError -> {
-            errorMessage.append(String.format("Field '%s' %s; ", fieldError.getField(), fieldError.getDefaultMessage()));
-        });
-
+        ex.getBindingResult().getFieldErrors().forEach(fieldError -> errorMessage.append(String.format("Field '%s' %s; ", fieldError.getField(), fieldError.getDefaultMessage())));
         ApiErrorResponse response = new ApiErrorResponse(errorMessage.toString(), HttpStatus.BAD_REQUEST.value());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
@@ -74,6 +77,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ApiErrorResponse> handleConstraintViolation(ConstraintViolationException ex) {
+        log.error("ConstraintViolationException: Validation error: {}", ex.getMessage());
         ApiErrorResponse response = new ApiErrorResponse("Validation error: " + ex.getMessage(), HttpStatus.BAD_REQUEST.value());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
@@ -90,6 +94,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiErrorResponse> handleUnreadable(HttpMessageNotReadableException ex) {
+        log.warn("HttpMessageNotReadableException: Malformed request: {}", ex.getMostSpecificCause().getMessage());
         ApiErrorResponse response = new ApiErrorResponse("Malformed request: " + ex.getMostSpecificCause().getMessage(), HttpStatus.BAD_REQUEST.value());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
@@ -106,24 +111,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ApiErrorResponse> handleMissingParams(MissingServletRequestParameterException ex) {
+        log.warn("MissingServletRequestParameterException: Missing required parameter: {}", ex.getParameterName());
         ApiErrorResponse response = new ApiErrorResponse("Missing required parameter: " + ex.getParameterName(), HttpStatus.BAD_REQUEST.value());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-    }
-
-    /**
-     * Handles any generic {@link Exception} that is not explicitly handled by other exception handlers.
-     * <p>
-     * This method catches unexpected errors and returns a response with HTTP status 500 (Internal Server Error),
-     * along with an error message describing the issue.
-     * </p>
-     *
-     * @param ex the exception thrown when an unexpected error occurs
-     * @return a {@link ResponseEntity} with an {@link ApiErrorResponse} containing the error message and status
-     */
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorResponse> handleGeneric(Exception ex) {
-        ApiErrorResponse response = new ApiErrorResponse("Unexpected error: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
     /**
@@ -138,6 +128,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<ApiErrorResponse> handleDatabaseError(SQLException ex) {
+        log.error("SQLException: Error occurred while fetching price data: {}", ex.getMessage());
         ApiErrorResponse response = new ApiErrorResponse("Error occurred while fetching price data: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
@@ -154,9 +145,69 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<?> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        log.warn("MethodArgumentTypeMismatchException: Invalid value for parameter '{}': {}", ex.getName(), ex.getValue());
         String message = String.format(
                 "Invalid value for parameter '%s': %s", ex.getName(), ex.getValue()
         );
         return ResponseEntity.badRequest().body(Map.of("message", message));
+    }
+
+    /**
+     * Handles errors related to database access, such as connection failures or timeouts.
+     *
+     * @param ex the thrown {@link DataAccessException}
+     * @return a {@link ResponseEntity} containing a structured {@link ApiErrorResponse}
+     */
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<ApiErrorResponse> dataAccessException(DataAccessException ex) {
+        log.error("Database access error", ex);
+        return buildErrorResponse("DATABASE_ERROR", "A database access error occurred", HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    /**
+     * Handles invalid request arguments.
+     *
+     * @param ex the thrown {@link IllegalArgumentException}
+     * @return a {@link ResponseEntity} containing a structured {@link ApiErrorResponse}
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiErrorResponse> handleBadRequest(IllegalArgumentException ex) {
+        log.warn("Bad request: {}", ex.getMessage());
+        return buildErrorResponse("BAD_REQUEST", ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Builds a standardized error response.
+     *
+     * @param code    internal error code
+     * @param message error message to return
+     * @param status  HTTP status code
+     * @return a {@link ResponseEntity} with the error details
+     */
+    private ResponseEntity<ApiErrorResponse> buildErrorResponse(String code, String message, HttpStatus status) {
+        ApiErrorResponse error = ApiErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(status.value())
+                .error(code)
+                .message(message)
+                .build();
+        return new ResponseEntity<>(error, status);
+    }
+
+    /**
+     * Handles any generic {@link Exception} that is not explicitly handled by other exception handlers.
+     * <p>
+     * This method catches unexpected errors and returns a response with HTTP status 500 (Internal Server Error),
+     * along with an error message describing the issue.
+     * </p>
+     *
+     * @param ex the exception thrown when an unexpected error occurs
+     * @return a {@link ResponseEntity} with an {@link ApiErrorResponse} containing the error message and status
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiErrorResponse> handleGeneric(Exception ex) {
+        log.error("Exception: Unexpected error: {}", ex.getMessage());
+        ApiErrorResponse response = new ApiErrorResponse("Unexpected error: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }

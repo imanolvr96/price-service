@@ -1,7 +1,10 @@
 package com.inditex.core.priceservice.infrastructure.rest.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -18,6 +21,9 @@ import java.time.LocalDateTime;
  */
 @Setter
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "Details about an API error response")
 public class ApiErrorResponse {
 
@@ -44,6 +50,12 @@ public class ApiErrorResponse {
      */
     @Schema(description = "Timestamp when the error occurred", example = "2025-05-08T14:23:45")
     private LocalDateTime timestamp;
+
+    /**
+     * An internal error code representing the type of error.
+     */
+    @Schema(description = "Internal error code", example = "INTERNAL_ERROR")
+    private String error;
 
     /**
      * Constructor for creating an ApiErrorResponse.
