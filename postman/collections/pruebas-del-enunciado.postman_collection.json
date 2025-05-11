@@ -1,0 +1,352 @@
+{
+	"info": {
+		"_postman_id": "bffdc7b5-4f71-4523-91eb-36841eaa03e1",
+		"name": "Pruebas del Enunciado",
+		"description": "Pruebas E2E para el endpoint de precios que se pide que se prueben adicionalmente",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "43077640"
+	},
+	"item": [
+		{
+			"name": "Prueba 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"// Verifica el status",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"// Verifica el precio",
+							"pm.test('Price is correct', function () {",
+							"    pm.response.to.have.jsonBody('price', 35.5);",
+							"});",
+							"// Verifica el productId",
+							"pm.test('Product ID is correct', function () {",
+							"    pm.response.to.have.jsonBody('productId', 35455);",
+							"});",
+							"// Verifica el brandId",
+							"pm.test('Brand ID is correct', function () {",
+							"    pm.response.to.have.jsonBody('brandId', 1);",
+							"});",
+							"// Verifica el priceList",
+							"pm.test('Price List is correct', function () {",
+							"    pm.response.to.have.jsonBody('priceList', 1);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&productId=35455&applicationDate=2020-06-14T10:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-14T10:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Prueba 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"// Verifica el status",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"// Verifica el precio",
+							"pm.test('Price is correct', function () {",
+							"    pm.response.to.have.jsonBody('price', 25.45);",
+							"});",
+							"// Verifica el productId",
+							"pm.test('Product ID is correct', function () {",
+							"    pm.response.to.have.jsonBody('productId', 35455);",
+							"});",
+							"// Verifica el brandId",
+							"pm.test('Brand ID is correct', function () {",
+							"    pm.response.to.have.jsonBody('brandId', 1);",
+							"});",
+							"// Verifica el priceList",
+							"pm.test('Price List is correct', function () {",
+							"    pm.response.to.have.jsonBody('priceList', 2);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&productId=35455&applicationDate=2020-06-14T16:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-14T16:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Prueba 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verifica el status",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"// Verifica el precio",
+							"pm.test('Price is correct', function () {",
+							"    pm.response.to.have.jsonBody('price', 35.50);",
+							"});",
+							"// Verifica el productId",
+							"pm.test('Product ID is correct', function () {",
+							"    pm.response.to.have.jsonBody('productId', 35455);",
+							"});",
+							"// Verifica el brandId",
+							"pm.test('Brand ID is correct', function () {",
+							"    pm.response.to.have.jsonBody('brandId', 1);",
+							"});",
+							"// Verifica el priceList",
+							"pm.test('Price List is correct', function () {",
+							"    pm.response.to.have.jsonBody('priceList', 1);",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&productId=35455&applicationDate=2020-06-14T21:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-14T21:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Prueba 4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"// Verifica el status",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"// Verifica el precio",
+							"pm.test('Price is correct', function () {",
+							"    pm.response.to.have.jsonBody('price', 30.5);",
+							"});",
+							"// Verifica el productId",
+							"pm.test('Product ID is correct', function () {",
+							"    pm.response.to.have.jsonBody('productId', 35455);",
+							"});",
+							"// Verifica el brandId",
+							"pm.test('Brand ID is correct', function () {",
+							"    pm.response.to.have.jsonBody('brandId', 1);",
+							"});",
+							"// Verifica el priceList",
+							"pm.test('Price List is correct', function () {",
+							"    pm.response.to.have.jsonBody('priceList', 3);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&productId=35455&applicationDate=2020-06-15T10:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-15T10:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Prueba 5",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"// Verifica el status",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"// Verifica el precio",
+							"pm.test('Price is correct', function () {",
+							"    pm.response.to.have.jsonBody('price', 38.95);",
+							"});",
+							"// Verifica el productId",
+							"pm.test('Product ID is correct', function () {",
+							"    pm.response.to.have.jsonBody('productId', 35455);",
+							"});",
+							"// Verifica el brandId",
+							"pm.test('Brand ID is correct', function () {",
+							"    pm.response.to.have.jsonBody('brandId', 1);",
+							"});",
+							"// Verifica el priceList",
+							"pm.test('Price List is correct', function () {",
+							"    pm.response.to.have.jsonBody('priceList', 4);",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&productId=35455&applicationDate=2020-06-16T21:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-16T21:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

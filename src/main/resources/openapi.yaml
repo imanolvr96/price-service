@@ -26,13 +26,13 @@ paths:
           required: true
           schema:
             type: integer
-          description: Unique identifier for the product.
+          description: The identifier for the product. This may not be unique.
         - in: query
           name: brandId
           required: true
           schema:
             type: integer
-          description: Unique identifier for the brand.
+          description: The identifier for the brand. This may not be unique.
       responses:
         '200':
           description: Successfully retrieved the price for the specified product and brand within the date range.
@@ -99,3 +99,17 @@ paths:
                 application/json:
                   value:
                     error: "Price not found for product 35455 and brand 1 at the specified date."
+        '500':
+          description: Internal server error, something went wrong on the server side.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Description of the error.
+              examples:
+                application/json:
+                  value:
+                    error: "Unexpected error occurred while processing the request."
