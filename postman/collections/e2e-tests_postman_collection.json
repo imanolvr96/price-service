@@ -1,0 +1,1067 @@
+{
+	"info": {
+		"_postman_id": "95381487-5ed0-49ac-a6a1-020a36a9197f",
+		"name": "Price API Tests",
+		"description": "E2E testing for the pricing endpoint.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "43077640"
+	},
+	"item": [
+		{
+			"name": "Test Get Applicable Price",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"// Verifica que el código de estado sea 200 (OK)",
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"// Verifica que el tipo de contenido sea JSON",
+							"pm.test('Content-Type is application/json', function () {",
+							"    pm.response.to.have.header('Content-Type', 'application/json');",
+							"});",
+							"// Verifica que el cuerpo de la respuesta tenga los campos correctos",
+							"pm.test('Response should contain product details', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.response.to.have.jsonBody('productId');",
+							"    pm.response.to.have.jsonBody('brandId');",
+							"    pm.response.to.have.jsonBody('priceList');",
+							"    pm.response.to.have.jsonBody('startDate');",
+							"    pm.response.to.have.jsonBody('endDate');",
+							"    pm.response.to.have.jsonBody('price');",
+							"});",
+							"// Verifica que el valor de los campos sea el esperado",
+							"pm.test('Product ID should be 35455', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.productId).to.eql(35455);",
+							"});",
+							"pm.test('Brand ID should be 1', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.brandId).to.eql(1);",
+							"});",
+							"pm.test('Price should be 35.50', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.price).to.eql(35.50);",
+							"});",
+							"pm.test('Price List should be 1', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.priceList).to.eql(1);",
+							"});",
+							"pm.test('Start Date should be 2020-06-14T00:00:00', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.startDate).to.eql('2020-06-14T00:00:00');",
+							"});",
+							"pm.test('End Date should be 2020-12-31T23:59:59', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.endDate).to.eql('2020-12-31T23:59:59');",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&productId=35455&applicationDate=2020-06-14T00:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-14T00:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Non-Existent Product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verifica que el código de estado sea 404 (Not Found) debido a que el producto no existe",
+							"pm.test('Status code is 404', function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"// Verifica que el mensaje de error sea el adecuado por producto inexistente",
+							"pm.test('Error message is correct', function () {",
+							"    pm.response.to.have.jsonBody('message', 'No price found for productId=99999, brandId=1, date=2020-06-14T00:00');",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&productId=99999&applicationDate=2020-06-14T00:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "productId",
+							"value": "99999"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-14T00:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Extra Param In Query",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status is 200 or 400 depending on API behavior', function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 400]);",
+							"});",
+							"",
+							"if (pm.response.code === 400) {",
+							"    pm.test('Should contain error message for extra parameter', function () {",
+							"        var jsonData = pm.response.json();",
+							"        pm.expect(jsonData.message.toLowerCase()).to.include('extra');",
+							"    });",
+							"} else if (pm.response.code === 200) {",
+							"    pm.test('Valid response despite extra parameter', function () {",
+							"        var jsonData = pm.response.json();",
+							"        pm.expect(jsonData).to.have.property('price');",
+							"    });",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&productId=35455&applicationDate=2020-06-14T10:00:00&extraParam=test",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-14T10:00:00"
+						},
+						{
+							"key": "extraParam",
+							"value": "test"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Missing BrandId Parameter",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verifica que el código de estado sea 400 (Bad Request) debido a la falta de brandId",
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"// Verifica que el cuerpo de la respuesta tenga el mensaje de error adecuado",
+							"pm.test('Error message is correct', function () {",
+							"    pm.response.to.have.jsonBody('message', 'Missing required parameter: brandId');",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?productId=35455&applicationDate=2020-06-14T00:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-14T00:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Missing brandId Parameter",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"// Espera un 400 Bad Request por falta de parámetro obligatorio",
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"// Verifica que el mensaje de error indique que falta brandId",
+							"pm.test('Error message mentions brandId', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message.toLowerCase()).to.include('brandid');",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?productId=35455&applicationDate=2020-06-14T10:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-14T10:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Date Out of Range",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verifica que el código de estado sea 404 (Not Found) ya que la fecha está fuera de rango",
+							"pm.test('Status code is 404', function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"// Verifica que el mensaje de error sea adecuado para fecha fuera de rango",
+							"pm.test('Error message is correct', function () {",
+							"    pm.response.to.have.jsonBody('message', 'No price found for productId=35455, brandId=1, date=2021-01-01T00:00');",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&productId=35455&applicationDate=2021-01-01T00:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2021-01-01T00:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test negative ProductId",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verifica que el código de estado sea 400 (Bad Request) debido a un productId inválido",
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"// Verifica que el cuerpo de la respuesta tenga el mensaje de error adecuado",
+							"pm.test('Error message is correct', function () {",
+							"    pm.response.to.have.jsonBody('message', 'Validation error: getPrice.productId: productId must be zero or positive');",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&productId=-35455&applicationDate=2020-06-14T00:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "productId",
+							"value": "-35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-14T00:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Missing ProductId",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verifica que el código de estado sea 400 (Bad Request) debido a que falta el parámetro productId",
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"// Verifica que el mensaje de error sea el adecuado por falta del productId",
+							"pm.test('Error message is correct', function () {",
+							"    pm.response.to.have.jsonBody('message', 'Missing required parameter: productId');",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&applicationDate=2020-06-14T00:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-14T00:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Invalid Product ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verifica que el código de estado sea 400 (Bad Request) por parámetro no numérico",
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"// Verifica que el mensaje de error sea adecuado para parámetros incorrectos",
+							"pm.test('Error message is correct', function () {",
+							"    pm.response.to.have.jsonBody('message', \"Invalid value for parameter 'productId': XYZ\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&productId=XYZ&applicationDate=2020-06-14T00:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "productId",
+							"value": "XYZ"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-14T00:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Invalid BrandId",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verifica que el código de estado sea 400 (Bad Request) debido a un brandId inválido",
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"// Verifica que el cuerpo de la respuesta tenga el mensaje de error adecuado",
+							"pm.test('Error message is correct', function () {",
+							"    pm.response.to.have.jsonBody('message', 'Validation error: getPrice.brandId: brandId must be zero or positive');",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=-1&productId=35455&applicationDate=2020-06-14T00:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "-1"
+						},
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-14T00:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Invalid Brand ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verifica que el código de estado sea 400 (Bad Request) por parámetro no numérico",
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"// Verifica que el mensaje de error sea adecuado para parámetros incorrectos",
+							"pm.test('Error message is correct', function () {",
+							"    pm.response.to.have.jsonBody('message', \"Invalid value for parameter 'brandId': ABC\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=ABC&productId=35455&applicationDate=2020-06-14T00:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "ABC"
+						},
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-14T00:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test Invalid Application Date",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verifica que el código de estado sea 400 (Bad Request) debido a que la fecha de aplicación es inválida",
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"// Verifica que el mensaje de error sea el adecuado por fecha inválida",
+							"pm.test('Error message is correct', function () {",
+							"    pm.response.to.have.jsonBody('message', \"Invalid value for parameter 'applicationDate': invalid-date\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&productId=35455&applicationDate=invalid-date",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "invalid-date"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test BrandId Null",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verifica que el código de estado sea 400 (Bad Request) ya que el parámetro 'brandId' es null",
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"// Verifica que el mensaje de error sea adecuado para el parámetro 'brandId' nulo",
+							"pm.test('Error message is correct', function () {",
+							"    pm.response.to.have.jsonBody('message', \"Invalid value for parameter 'brandId': null\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=null&productId=35455&applicationDate=2021-01-01T00:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "null"
+						},
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2021-01-01T00:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test ProductId Null",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verifica que el código de estado sea 400 (Bad Request) ya que el parámetro 'productId' es null",
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"// Verifica que el mensaje de error sea adecuado para el parámetro 'productId' nulo",
+							"pm.test('Error message is correct', function () {",
+							"    pm.response.to.have.jsonBody('message', \"Invalid value for parameter 'productId': null\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&productId=null&applicationDate=2021-01-01T00:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "productId",
+							"value": "null"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2021-01-01T00:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test ApplicationDate Null",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Verifica que el código de estado sea 400 (Bad Request) ya que el parámetro 'applicationDate' es null",
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"// Verifica que el mensaje de error sea adecuado para el parámetro 'applicationDate' nulo",
+							"pm.test('Error message is correct', function () {",
+							"    pm.response.to.have.jsonBody('message', \"Invalid value for parameter 'applicationDate': null\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&productId=35455&applicationDate=null",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "null"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test ProductId Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test('Error message mentions productId', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.include('productId');",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&productId=&applicationDate=2020-06-14T10:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "productId",
+							"value": ""
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-14T10:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test ApplicationDate Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test('Error message mentions applicationDate', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.include('applicationDate');",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=1&productId=35455&applicationDate=",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": "1"
+						},
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Test BrandId Empty",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 400', function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test('Error message mentions brandId', function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.include('brandId');",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "localhost:8080/api/prices?brandId=&productId=35455&applicationDate=2020-06-14T10:00:00",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"prices"
+					],
+					"query": [
+						{
+							"key": "brandId",
+							"value": ""
+						},
+						{
+							"key": "productId",
+							"value": "35455"
+						},
+						{
+							"key": "applicationDate",
+							"value": "2020-06-14T10:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
