@@ -50,7 +50,6 @@ To install the dependencies, run the following command:
 ## Requirements
 
 - **JDK 23** or higher
-- **Maven 3.6.3** or higher
 - **Postman** (for testing if you want to use the Postman collections)
 
 ---
@@ -90,9 +89,13 @@ Retrieves the price of a product for a specific brand within a date range.
 
 ##### Responses:
 
-- **200 OK**: If the price is found.
-- **400 Bad Request**: If the input parameters are invalid.
+- **200 OK**: If the price is found and the request is successful.
+- **400 Bad Request**: If the input parameters are invalid or malformed (e.g., invalid date format, missing required parameters).
 - **404 Not Found**: If no price is found for the product and brand within the specified dates.
+- **500 Internal Server Error**: If an unexpected error occurs on the server while processing the request.
+- **401 Unauthorized**: If the request requires authentication but no valid authentication credentials were provided.
+- **403 Forbidden**: If the request is understood but the server refuses to authorize it (e.g., lack of proper permissions).
+- **405 Method Not Allowed**: If the HTTP method used is not supported by the specified endpoint (e.g., sending a POST request to a GET-only endpoint).
 
 #### Example Requests:
 
@@ -135,7 +138,7 @@ GET localhost:8080/api/prices?brandId=1&productId=35455&applicationDate=2020-06-
 To run the unit tests, use the following Maven command:
 
 ```bash
-mvn test
+mvnw test
 ```
 
 This will run all the unit tests in the project, ensuring that various components and functionality of the service work
@@ -167,7 +170,7 @@ variables for running the tests in your local environment.
 To deploy the application, you can package it into a JAR file using Maven:
 
 ```bash
-mvn clean package
+./mvnw clean package
 ```
 
 Then, you can run the application using:
