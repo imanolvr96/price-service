@@ -21,6 +21,7 @@ product in the specified date range, a 404 error is returned.
     - [Postman Collection](#postman-collection)
     - [Postman Environment](#postman-environment)
 - [Deployment](#deployment)
+- [Warning about Mockito](#warning-about-mockito)
 - [License](#license)
 
 ---
@@ -32,20 +33,18 @@ product in the specified date range, a 404 error is returned.
 First, clone this repository to your local machine using Git:
 
 ```bash
-git clone https://github.com/your-user/price-service.git
+git clone https://github.com/imanolvr96/price-service.git
 ```
 
 ### 2. Install dependencies
 
-This project uses **Maven** to manage dependencies. If you don't have Maven installed, please follow
-the [official Maven documentation](https://maven.apache.org/install.html).
+This project uses **Maven** to manage dependencies. If you don't have Maven installed, you don't need to worry, as this project includes the **Maven Wrapper**. 
 
 To install the dependencies, run the following command:
 
 ```bash
-mvn install
+./mvnw install
 ```
-
 ---
 
 ## Requirements
@@ -63,16 +62,7 @@ mvn install
    testing.
 
 2. **Configuration properties**:
-   You can configure the service properties in the `application.properties` file:
-
-   ```properties
-   server.port=8080
-   spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
-   spring.datasource.driverClassName=org.h2.Driver
-   spring.datasource.username=sa
-   spring.datasource.password=password
-   spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-   ```
+   You can configure the service properties in the `application.yml` file:
 
 3. **Swagger UI**:
    If you want to view the interactive API documentation, you can use Swagger. Simply go to the following URL after
@@ -109,7 +99,7 @@ Retrieves the price of a product for a specific brand within a date range.
 **Query the price of a product:**
 
 ```bash
-GET http://localhost:8080/prices?productId=35455&brandId=1&date=2020-06-14T10:00:00
+GET localhost:8080/api/prices?brandId=1&productId=35455&applicationDate=2020-06-14T00:00:00
 ```
 
 **Expected Response (200 OK):**
@@ -129,7 +119,10 @@ GET http://localhost:8080/prices?productId=35455&brandId=1&date=2020-06-14T10:00
 
 ```json
 {
-  "error": "Price not found for product 35455 and brand 1 at the specified date."
+   "message": "No price found for productId=99999, brandId=1, date=2020-06-14T00:00",
+   "status": 404,
+   "timestamp": "2025-05-11T17:34:24.392325",
+   "error": null
 }
 ```
 
@@ -184,6 +177,16 @@ java -jar target/price-service-1.0.0.jar
 ```
 
 The service will start on port 8080 by default.
+
+---
+
+## Warning about Mockito
+
+When running the tests, you might encounter the following warning:
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation.
+This warning appears because, starting with JDK 17, inline mocking using **Mockito** is no longer supported out of the box. To resolve this and avoid warnings, you should add 
+
+**Mockito as a Java Agent** during the test execution.
 
 ---
 
