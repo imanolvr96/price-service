@@ -1,6 +1,7 @@
-package com.inditex.core.priceservice.infrastructure.rest.controller;
+package com.inditex.core.priceservice.unit.infrastructure.rest.controller;
 
 import com.inditex.core.priceservice.application.service.PriceService;
+import com.inditex.core.priceservice.infrastructure.rest.controller.PriceController;
 import com.inditex.core.priceservice.infrastructure.rest.dto.PriceResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
